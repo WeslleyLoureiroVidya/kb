@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Artigo - Vidya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos para garantir que imagens e vídeos do Movidesk fiquem bem ajustados */
+        .artigo-corpo img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .artigo-corpo iframe, .artigo-corpo video {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .artigo-corpo p {
+            margin-bottom: 1rem;
+        }
+        .artigo-corpo ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .artigo-corpo ol {
+            list-style-type: decimal;
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col justify-between">
+
+    <!-- Cabeçalho -->
+    <header class="bg-white border-b border-slate-200 px-6 py-4 shadow-sm flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="bg-slate-100 hover:bg-slate-200 p-2 rounded-lg text-slate-600 transition-colors flex items-center gap-2 text-sm font-medium">
+                &larr; Voltar
+            </a>
+            <h1 id="titulo-topo" class="text-sm font-bold text-slate-800 truncate max-w-xl">Carregando artigo...</h1>
+        </div>
+        <span id="categoria-badge" class="bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full border border-blue-200">-</span>
+    </header>
+
+    <!-- Conteúdo do Artigo -->
+    <main class="max-w-3xl w-full mx-auto p-6 flex-1 my-6 bg-white rounded-2xl shadow-sm border border-slate-200">
+        <h2 id="artigo-titulo" class="text-2xl font-bold text-slate-900 mb-2">Carregando...</h2>
+        <p id="artigo-data" class="text-xs text-slate-400 mb-6 pb-4 border-b border-slate-100"></p>
+        
+        <div id="artigo-conteudo" class="artigo-corpo text-slate-700 text-base leading-relaxed">
+            <p class="text-slate-500">Buscando conteúdo do artigo...</p>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+        Vidya Code &bull; Base de Conhecimento Integrada
+    </footer>
+
+    <!-- Script para carregar o artigo específico -->
+    <script>
+        async function carregarArtigoUnico() {
+            const params = new URLSearchParams(window.location.search);
+            const artigoId = params.get('id');
+
+            if (!artigoId) {
+                document.getElementById('artigo-conteudo').innerHTML = '<p class="text-red-500">Artigo não especificado.</p>';
+                return;
+            }
+
+            try {
+                const resposta = await fetch('artigos.json');
+                const artigos = await resposta.json();
+                
+                // Encontra o artigo correspondente pelo ID
+                const artigo = artigos.find(a => String(a.id) === String(artigoId));
+
+                if (!artigo) {
+                    document.getElementById('artigo-conteudo').innerHTML = '<p class="text-red-500">Artigo não encontrado.</p>';
+                    return;
+                }
+
+                // Preenche os dados na tela
+                document.title = `${artigo.title} - Base de Conhecimento Vidya`;
+                document.getElementById('titulo-topo').innerText = artigo.title;
+                document.getElementById('artigo-titulo').innerText = artigo.title;
+                document.getElementById('categoria-badge').innerText = artigo.category || 'Geral';
+                
+                if (artigo.createdDate) {
+                    const dataFormatada = new Date(artigo.createdDate).toLocaleDateString('pt-BR');
+                    document.getElementById('artigo-data').innerText = `Criado em: ${dataFormatada}`;
+                }
+
+                // Insere o HTML completo (permitindo imagens, vídeos e formatações do Movidesk)
+                document.getElementById('artigo-conteudo').innerHTML = artigo.content;
+
+            } catch (erro) {
+                console.error(erro);
+                document.getElementById('artigo-conteudo').innerHTML = '<p class="text-red-500">Erro ao carregar os dados do artigo.</p>';
+            }
+        }
+
+        carregarArtigoUnico();
+    </script>
+</body>
+</html>
