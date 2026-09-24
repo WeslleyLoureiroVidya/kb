@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Suporte</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h2 {
+            font-size: 2.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .card p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Portal de Atendimento</h1>
+        <span id="status-badge" style="background: #dcfce7; color: #15803d; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">Sistemas Operacionais</span>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h2>Como podemos ajudar hoje?</h2>
+            <p>Acesse rapidamente os recursos, abra chamados ou consulte nossa base de conhecimento.</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Abrir Chamado</h3>
+                <p>Precisa de suporte técnico ou relatar uma inconsistência? Abra um ticket agora.</p>
+                <a href="#" class="btn" onclick="alert('Redirecionando para o sistema de tickets...'); return false;">Acessar Tickets</a>
+            </div>
+
+            <div class="card">
+                <h3>Base de Conhecimento</h3>
+                <p>Consulte tutoriais, documentações de integrações e perguntas frequentes.</p>
+                <a href="#" class="btn" onclick="alert('Abrindo base de conhecimento...'); return false;">Ver Documentos</a>
+            </div>
+
+            <div class="card">
+                <h3>Status das APIs</h3>
+                <p>Monitore em tempo real a estabilidade dos webhooks e dos serviços integrados.</p>
+                <a href="#" class="btn" onclick="alert('Verificando status dos serviços...'); return false;">Verificar Status</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Central de Operações. Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>
