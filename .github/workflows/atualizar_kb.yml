@@ -6,6 +6,9 @@ on:
     - cron: '0 6 * * *'
   workflow_dispatch: # Permite que você clique em um botão para rodar manualmente quando quiser!
 
+permissions:
+  contents: write
+
 jobs:
   sincronizar:
     runs-on: ubuntu-latest
