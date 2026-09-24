@@ -5,7 +5,7 @@ import requests
 
 MOVIDESK_TOKEN = os.getenv("MOVIDESK_TOKEN")
 # Substitua pelo endereço base do seu Movidesk (ex: https://suaempresa.movidesk.com)
-MOVIDESK_BASE_URL = "https://suaempresa.movidesk.com"
+MOVIDESK_BASE_URL = "https://vidya-code.movidesk.com"
 
 def corrigir_urls_imagens(conteudo, token):
     if not conteudo:
