@@ -1,10 +1,40 @@
 import os
 import json
+import re
 import requests
 
 MOVIDESK_TOKEN = os.getenv("MOVIDESK_TOKEN")
-# Substitua pelo endereço do seu Movidesk (ex: https://suaempresa.movidesk.com)
-MOVIDESK_BASE_URL = "https://vidya-code.movidesk.com" 
+# Substitua pelo endereço base do seu Movidesk (ex: https://suaempresa.movidesk.com)
+MOVIDESK_BASE_URL = "https://suaempresa.movidesk.com"
+
+def corrigir_urls_imagens(conteudo, token):
+    if not conteudo:
+        return ""
+    
+    # 1. Se a imagem apontar para caminhos relativos simples (/file/...), adiciona o domínio base
+    conteudo = conteudo.replace('src="/', f'src="{MOVIDESK_BASE_URL}/')
+    conteudo = conteudo.replace("src='/", f"src='{MOVIDESK_BASE_URL}/")
+
+    # 2. Converte links internos de armazenamento do Movidesk para a rota oficial de download com token
+    # Padrão comum de imagens anexadas no editor interno
+    def substituir_src(match):
+        url_original = match.group(1)
+        # Se já tiver token ou for link externo completo válido, mantém
+        if "token=" in url_original:
+            return f'src="{url_original}"'
+        
+        # Se for um link de storage interno sem token, anexa o token da API
+        if "/storage/" in url_original or "/file/" in url_original or "id=" in url_original:
+            separador = "&" if "?" in url_original else "?"
+            return f'src="{url_original}{separador}token={token}"'
+        
+        return f'src="{url_original}"'
+
+    # Aplica a substituição em todas as tags img src="..."
+    conteudo = re.sub(r'src="([^"]+)"', substituir_src, conteudo)
+    conteudo = re.sub(r"src='([^']+)'", lambda m: substituir_src(m).replace('src="', "src='").replace('">', "'>"), conteudo)
+
+    return conteudo
 
 def buscar_artigos_movidesk():
     if not MOVIDESK_TOKEN:
@@ -20,20 +50,15 @@ def buscar_artigos_movidesk():
             artigos_formatados = []
             
             for artigo in dados:
-                conteudo = artigo.get("body", "")
-                
-                # CORREÇÃO DE IMAGENS: Se o link da imagem vier relativo (ex: /file/download?...),
-                # adicionamos o domínio do Movidesk na frente para o navegador conseguir carregar.
-                if conteudo:
-                    conteudo = conteudo.replace('src="/', f'src="{MOVIDESK_BASE_URL}/')
-                    conteudo = conteudo.replace("src='/", f"src='{MOVIDESK_BASE_URL}/")
+                conteudo_bruto = artigo.get("body", "")
+                conteudo_tratado = corrigir_urls_imagens(conteudo_bruto, MOVIDESK_TOKEN)
 
                 artigos_formatados.append({
                     "id": artigo.get("id"),
                     "title": artigo.get("title"),
                     "category": artigo.get("category"),
                     "createdDate": artigo.get("createdDate"),
-                    "content": conteudo 
+                    "content": conteudo_tratado 
                 })
             return artigos_formatados
         else:
