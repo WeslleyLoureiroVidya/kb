@@ -19,51 +19,37 @@
             </div>
             <div>
                 <h1 class="text-lg font-bold text-slate-800">Base de Conhecimento - Vidya</h1>
-                <p class="text-xs text-slate-500">Busca inteligente de artigos e procedimentos do Movidesk</p>
+                <p class="text-xs text-slate-500">Consulta inteligente aos artigos do Movidesk</p>
             </div>
         </div>
-        <span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full border border-emerald-200">Online</span>
+        <span id="contador-artigos" class="bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full border border-blue-200">Carregando...</span>
     </header>
 
-    <!-- Conteúdo Principal / Área de Busca e Chat -->
+    <!-- Conteúdo Principal -->
     <main class="max-w-4xl w-full mx-auto p-4 flex-1 flex flex-col my-6">
         
-        <!-- Barra de Pesquisa Inicial -->
+        <!-- Barra de Pesquisa -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6 text-center">
             <h2 class="text-xl font-semibold text-slate-800 mb-2">O que você está procurando hoje?</h2>
-            <p class="text-sm text-slate-500 mb-4">Digite uma dúvida ou palavra-chave para consultar os artigos da Vidya.</p>
+            <p class="text-sm text-slate-500 mb-4">Digite uma palavra-chave para buscar instantaneamente na base de dados.</p>
             
-            <div class="flex gap-2 max-w-2xl mx-auto">
+            <div class="max-w-2xl mx-auto">
                 <input 
                     type="text" 
                     id="search-input" 
-                    placeholder="Ex: Como configurar a integração, regras de SLA, etc..." 
-                    class="flex-1 border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-sm"
+                    placeholder="Ex: Integração, SLA, Acessos, Relatórios..." 
+                    class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-sm shadow-sm"
+                    oninput="filtrarArtigos()"
                 >
-                <button onclick="realizarBusca()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium text-sm transition-colors">
-                    Buscar
-                </button>
             </div>
         </div>
 
-        <!-- Resultados / Conversa -->
-        <div id="results-container" class="space-y-4 flex-1">
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-2">Artigos Recentes / Sugeridos</h3>
-                <ul class="space-y-2 text-sm text-slate-700">
-                    <li class="p-2 hover:bg-slate-50 rounded cursor-pointer transition-colors border-b border-slate-100 flex justify-between items-center">
-                        <span>📖 Guia de Acessos e Perfis de Usuário</span>
-                        <span class="text-xs text-slate-400">Privado / Implantação</span>
-                    </li>
-                    <li class="p-2 hover:bg-slate-50 rounded cursor-pointer transition-colors border-b border-slate-100 flex justify-between items-center">
-                        <span>📖 Padrões de Atendimento e Fluxo de Tickets</span>
-                        <span class="text-xs text-slate-400">Público</span>
-                    </li>
-                    <li class="p-2 hover:bg-slate-50 rounded cursor-pointer transition-colors flex justify-between items-center">
-                        <span>📖 Configuração de Webhooks e Integrações</span>
-                        <span class="text-xs text-slate-400">Privado / Técnico</span>
-                    </li>
-                </ul>
+        <!-- Lista de Resultados -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex-1">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Artigos Disponíveis</h3>
+            <div id="lista-artigos" class="space-y-3">
+                <!-- Os artigos serão inseridos dinamicamente aqui via JavaScript -->
+                <p class="text-sm text-slate-500 text-center py-8">Carregando artigos da base de conhecimento...</p>
             </div>
         </div>
     </main>
@@ -73,22 +59,63 @@
         Vidya Code &bull; Base de Conhecimento Integrada
     </footer>
 
+    <!-- Script para carregar e filtrar os artigos do arquivo artigos.json -->
     <script>
-        function realizarBusca() {
-            const query = document.getElementById('search-input').value;
-            if(!query) return;
-            
-            const container = document.getElementById('results-container');
-            container.innerHTML = `
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-sm font-bold text-slate-800 mb-2">Resultados para: "${query}"</h3>
-                    <p class="text-sm text-slate-600 mb-3">Buscando na base de artigos da Vidya...</p>
-                    <div class="p-3 bg-blue-50 text-blue-900 rounded-lg text-sm">
-                        <em>(Aqui será feita a conexão com a API do Movidesk / IA para trazer a resposta exata do artigo correspondente.)</em>
+        let todosArtigos = [];
+
+        // Carrega o arquivo JSON gerado pelo GitHub Actions assim que a página abre
+        async function carregarArtigos() {
+            try {
+                const resposta = await fetch('artigos.json');
+                if (!resposta.ok) throw new Error('Não foi possível carregar os dados.');
+                
+                todosArtigos = await resposta.json();
+                document.getElementById('contador-artigos').innerText = `${todosArtigos.length} artigos sincronizados`;
+                exibirArtigos(todosArtigos);
+            } catch (erro) {
+                console.error(erro);
+                document.getElementById('lista-artigos').innerHTML = `
+                    <div class="p-4 bg-amber-50 text-amber-800 rounded-xl text-sm border border-amber-200 text-center">
+                        <strong>Aviso:</strong> O arquivo <code>artigos.json</code> ainda não foi gerado ou sincronizado. Execute a Action no GitHub para popular a base de conhecimento.
                     </div>
-                </div>
-            `;
+                `;
+                document.getElementById('contador-artigos').innerText = 'Aguardando sincronização';
+            }
         }
+
+        // Renderiza a lista de artigos na tela
+        function exibirArtigos(artigos) {
+            const container = document.getElementById('lista-artigos');
+            
+            if (artigos.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-500 text-center py-8">Nenhum artigo encontrado.</p>`;
+                return;
+            }
+
+            container.innerHTML = artigos.map(artigo => `
+                <div class="p-4 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer flex flex-col gap-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-slate-800 text-base">📖 ${artigo.title}</h4>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">${artigo.category || 'Geral'}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 line-clamp-2 mt-1">${artigo.content.replace(/<[^>]*>?/gm, '')}</p>
+                </div>
+            `).join('');
+        }
+
+        // Filtra os artigos em tempo real conforme o usuário digita
+        function filtrarArtigos() {
+            const termo = document.getElementById('search-input').value.toLowerCase();
+            const filtrados = todosArtigos.filter(artigo => 
+                artigo.title.toLowerCase().includes(termo) || 
+                artigo.content.toLowerCase().includes(termo) ||
+                (artigo.category && artigo.category.toLowerCase().includes(termo))
+            );
+            exibirArtigos(filtrados);
+        }
+
+        // Executa ao carregar a página
+        carregarArtigos();
     </script>
 </body>
 </html>
